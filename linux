@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Función para mostrar mensajes de ayuda
+function print_help() {
+    echo "Instalador para el servidor y cliente en Kali Linux"
+    echo "Este script instalará los archivos necesarios y configurará el entorno para ejecutar el servidor y cliente."
+}
+
+# Verificar si el script se está ejecutando como root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Este script debe ejecutarse como root o con permisos de sudo."
+    exit 1
+fi
+
+# Actualizar los repositorios y los paquetes del sistema
+echo "Actualizando repositorios..."
+apt update -y
+apt upgrade -y
+
+# Instalar dependencias necesarias (Python, si no está instalado)
+echo "Instalando Python si es necesario..."
+apt install python3 python3-pip -y
+
+# Si tienes alguna librería adicional que instalar, puedes hacerlo aquí.
+# Por ejemplo:
+# pip3 install requests
+
+# Crear los directorios para los scripts
+mkdir -p /opt/mi_app/servidor
+mkdir -p /opt/mi_app/cliente
+
+# Copiar los archivos del servidor y cliente (supongamos que están en el mismo directorio que el script)
+echo "Copiando archivos del servidor y cliente..."
+cp ./server.py /opt/mi_app/servidor/
+cp ./client.py /opt/mi_app/cliente/
+
+# Crear accesos directos (si deseas ejecutarlos fácilmente desde la terminal)
+echo "Creando accesos directos..."
+echo "#!/bin/bash" > /usr/local/bin/servidor
+echo "python3 /opt/mi_app/servidor/server.py" >> /usr/local/bin/servidor
+chmod +x /usr/local/bin/servidor
+
+echo "#!/bin/bash" > /usr/local/bin/cliente
+echo "python3 /opt/mi_app/cliente/client.py" >> /usr/local/bin/cliente
+chmod +x /usr/local/bin/cliente
+
+# Verificar si los archivos se han copiado correctamente
+if [ -f /opt/mi_app/servidor/server.py ] && [ -f /opt/mi_app/cliente/client.py ]; then
+    echo "Los archivos se copiaron correctamente."
+else
+    echo "Hubo un problema al copiar los archivos. Abortando."
+    exit 1
+fi
+
+# Mostrar mensajes de éxito y cómo ejecutar los scripts
+echo "Instalación completada. Ahora puedes ejecutar el servidor con 'servidor' o el cliente con 'cliente'."
+
+# Fin del script
+exit 0
